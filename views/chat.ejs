@@ -44,6 +44,9 @@
   <script>
     var socket = io();
     const chatMessages = document.querySelector(".chat-messages");
+    const roomName = document.getElementById('room-name');
+    const userList = document.getElementById('users');
+
     //username and room name using qs queryString library
     const { username, room } = Qs.parse(location.search, {
       ignoreQueryPrefix: true
@@ -58,6 +61,24 @@
     socket.on('message', (msg) => {
       console.log(msg);
     });
+
+    // get user info
+    socket.on('roomUsers', ({ room, users }) => {
+      outputRoomName(room);
+      outputUsers(users);
+    });
+    function outputRoomName(room) {
+      roomName.innerText = room;
+    }
+
+    function outputUsers(users) {
+      userList.innerHTML = '';
+      users.forEach((user) => {
+        const li = document.createElement('li');
+        li.innerText = user.username;
+        userList.appendChild(li);
+      });
+    }
 
     document.querySelector("#chat-form")
       .addEventListener("submit", (e) => {
@@ -77,6 +98,7 @@
       // scroll down automatically whenever new msg is receivd
 
       chatMessages.scrollTop = chatMessages.scrollHeight
+
     })
 
 
